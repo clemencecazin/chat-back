@@ -18,13 +18,14 @@ router.post("/add/conversation", async (req, res) => {
 });
 
 router.put("/update/conversation/:id", async (req, res) => {
-    const conversationStatus = await Conversation.findById(req.params.id);
+    const conversationStatus = await Conversation.findById(
+        req.params.id
+    ).populate({
+        path: "messages",
+    });
 
     try {
         if (conversationStatus) {
-            if (messagesConversation) {
-                await conversationStatus.populate("messageConversation");
-            }
             conversationStatus.active = req.fields.active;
             await conversationStatus.save();
 
@@ -49,7 +50,19 @@ router.get("/conversation/:id", async (req, res) => {
     }
 });
 
-router.delete("/conversation/delete/:id", async (req, res) => {
+router.get("/conversations/", async (req, res) => {
+    try {
+        const conversations = await Conversation.find().populate({
+            path: "messages",
+        });
+
+        res.json(conversations);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.delete("/delete/conversation/:id", async (req, res) => {
     try {
         messagesConversationToDelete = await Messages.deleteMany({
             conversation: { $in: req.params.id },
@@ -58,8 +71,6 @@ router.delete("/conversation/delete/:id", async (req, res) => {
         conversationToDelete = await Conversation.findByIdAndDelete(
             req.params.id
         );
-
-        console.log(messagesConversationToDelete);
 
         res.status(200).json("Conversation deleted successfully !");
     } catch (error) {

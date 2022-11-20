@@ -3,14 +3,12 @@ const router = express.Router();
 const Conversation = require("../models/Conversation");
 const Messages = require("../models/Messages");
 
-router.post("/add/messages/", async (req, res) => {
+router.post("/add/messages", async (req, res) => {
     try {
         const newMessage = new Messages({
             conversation: req.query.id,
-            messages: {
-                message: [req.fields.message],
-                sender: req.fields.sender,
-            },
+            message: req.fields.message,
+            sender: req.fields.sender,
         });
 
         await newMessage.save();
@@ -20,7 +18,6 @@ router.post("/add/messages/", async (req, res) => {
         );
 
         conversation.messages = [...conversation.messages, newMessage._id];
-
         await conversation.save();
 
         res.status(200).json(newMessage);
