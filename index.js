@@ -15,7 +15,7 @@ const messages = require("./routes/messages");
 app.use(conversation);
 app.use(messages);
 
-mongoose.connect("mongodb://localhost/chat", {
+mongoose.connect("mongodb://127.0.0.1/chat", {
     useUnifiedTopology: true,
     useNewUrlParser: true,
 });
